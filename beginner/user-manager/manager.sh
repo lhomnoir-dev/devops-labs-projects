@@ -3,42 +3,77 @@
 # ── Vérifications ────────────────────────────────────────────
 
 # 1. Vérifier que le script est exécuté en tant que root
-#    indice: $EUID contient l'ID de l'utilisateur courant (0 = root)
+if [ "$EUID" -ne 0 ]; then
+    echo "Ce script doit être exécuté en tant que root."
+    exit 1
+fi
 
 
 # ── Fonctions ────────────────────────────────────────────────
 
-# 2. Fonction lister_utilisateurs
-#    afficher tous les utilisateurs avec un UID >= 1000 (utilisateurs réels)
-#    indice: /etc/passwd contient tous les utilisateurs
-#    format voulu : nom - UID - shell
-list_user() {
-    # ...
+list_users() {
+    awk -F':' '$3>=1000 {printf "  %-15s UID:%-6s Shell:%s\n", $1, $3, $7}' /etc/passwd
 }
 
-# 3. Fonction creer_utilisateur
-#    demander le nom, créer l'utilisateur, définir son mot de passe
-#    indice: useradd, passwd
-#    vérifier que l'utilisateur n'existe pas déjà avant de le créer
-#    indice: id <nom> retourne 0 si l'utilisateur existe
 create_user() {
-    # ...
+    local username
+    local password
+
+    read -p "Nom d'utilisateur : " username
+    read -sp "Mot de passe : " password
+    echo
+
+    if [ -z "$username" ]; then
+        echo "[ERREUR] Le nom d'utilisateur ne peut pas être vide."
+        return 1
+    fi
+
+    if id "$username" &>/dev/null; then
+        echo "[ERREUR] L'utilisateur '$username' existe déjà."
+        return 1
+    fi
+
+    useradd -m "$username"
+    echo "$password" | passwd --stdin "$username"
+    echo "[OK] Utilisateur '$username' créé."
 }
 
 # 4. Fonction supprimer_utilisateur
-#    demander le nom, confirmer la suppression, supprimer l'utilisateur
-#    indice: userdel -r (supprime aussi le dossier home)
-#    vérifier que l'utilisateur existe avant de le supprimer
 del_user() {
-    # ...
+    local username
+    local response
+
+    read -p "Nom d'utilisateur : " username
+    echo
+
+    if [ -z "$username" ]; then
+        echo "[ERREUR] Le nom d'utilisateur ne peut pas être vide."
+        return 1
+    fi
+
+    if ! id "$username" &>/dev/null; then
+        echo "[ERREUR] L'utilisateur '$username' n'existe pas."
+        return 1
+    fi
+
+    read -p "Voulez-vous vraiment supprimer '$username' ? (y/n): " response
+    if [ "$response" = "y" ]; then
+        userdel -r "$username"
+        echo "[OK] Utilisateur '$username' supprimé."
+    else
+        echo "Suppression annulée."
+    fi
 }
 
 
 # ── Menu principal ────────────────────────────────────────────
-
-# 5. Afficher un menu avec select et appeler la bonne fonction
-#    options : Lister, Créer, Supprimer, Quitter
-#    indice: select choix in "option1" "option2" ...
-
 echo "=== Gestionnaire d'utilisateurs ==="
-# ...
+select choix in "Lister" "Créer" "Supprimer" "Quitter"; do
+    case $choix in
+        "Lister")  list_users  ;;
+        "Créer")   create_user   ;;
+        "Supprimer") del_user  ;;
+        "Quitter")  break ;;
+        *)           echo "Option invalide" ;;
+    esac
+done

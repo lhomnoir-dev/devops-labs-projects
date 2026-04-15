@@ -1,0 +1,15 @@
+[2026-04-14 23:39:11] https://google.com - 301 ALERTE
+[2026-04-14 23:39:12] https://github.com - 200 OK
+[2026-04-14 23:41:26] https://monsite.com - 000 ALERTE
+[2026-04-14 23:42:26] https://google.com - 301 ALERTE
+[2026-04-14 23:42:29] https://github.com - 200 OK
+[2026-04-14 23:43:42] https://google.com - 301 ALERTE
+[2026-04-14 23:43:46] https://github.com - 200 OK
+[2026-04-14 23:46:00] https://monsite.com - 000 ALERTE
+[2026-04-14 23:46:01] https://youtube.com - 301 ALERTE
+[2026-04-14 23:46:02] https://facebook.com - 301 ALERTE
+[2026-04-14 23:58:32] https://google.com - 301 ALERTE
+[2026-04-14 23:58:45] https://monsite.com - 000 ALERTE
+[2026-04-14 23:58:46] https://youtube.com - 301 ALERTE
+[2026-04-14 23:58:46] https://facebook.com - 301 ALERTE
+[2026-04-14 23:59:47] https://google.com - 301 ALERTE
